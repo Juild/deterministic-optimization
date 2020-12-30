@@ -27,11 +27,24 @@ double calc_alpha(double *r, double *d, int len){
     double alpha = numerator/denominator;
     return alpha;
 }
-
+double calc_beta(double *old_r, double *new_r, int len){
+    double beta;
+    double numerator = 0;
+    double denominator = 0;
+    for(int i = 0; i < len; ++i)
+        numerator += new_r[i]*new_r[i];
+    for(int i = 0; i < len; ++i)
+        denominator += old_r[i]*old_r[i];
+    beta = numerator/denominator;
+    return beta;
+}
 double CGD(long unsigned int iters, double seed_x1, double seed_x2){
     double r_vecs[iters + 1][2];
     double d_vecs[iters + 1][2];
     double x_vecs[iters + 1][2];
+    double beta;
+    double alpha;
+    
     //initial conditions
     x_vecs[0][0] = seed_x1;
     x_vecs[0][1] = seed_x2;
@@ -40,12 +53,17 @@ double CGD(long unsigned int iters, double seed_x1, double seed_x2){
         d_vecs[0][i] = r_vecs[0][i]; // d0 = r0
     //iterative process
     for(int k = 0; k != iters; ++k){
-        double alpha_k = calc_alpha(r_vecs[k], d_vecs[k], 2);
+        alpha = calc_alpha(r_vecs[k], d_vecs[k], 2);
         for(int i = 0; i < 2; ++i)
-            x_vecs[k + 1][i] = x_vecs[k][i] + alpha_k * d_vecs[k][i];
+            x_vecs[k + 1][i] = x_vecs[k][i] + alpha * d_vecs[k][i];
         // we moved to the next point. Now we must compute the next direction we will jump in
         // for that we have to compute the beta_k, but to do that we need to know the -gradient (r) value at this point we just moved to
-        calc_r(x_vecs[k][0], x_vecs[k][1], r_vecs[k], 2);
+        calc_r(x_vecs[k][0], x_vecs[k][1], r_vecs[k + 1], 2);
+        // now we compute beta
+        beta = calc_beta(r[k], r[k + 1], 2);
+        for(int i = 0; i < 2: ++i)
+            d_vecs[k + 1][i] = r_vecs[k][i] + beta * d_vecs[k][i];
+
     }
     
     
