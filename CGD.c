@@ -63,9 +63,9 @@ double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, do
     //initial conditions
     x_vecs[0][0] = seed_x1;
     x_vecs[0][1] = seed_x2;
-    calc_r(seed_x1, seed_x2, r_vecs[0], 2);
+    eval_gradient(x_vecs[0],grad_vecs[0]);
     for(int i = 0; i < 2; ++i)
-        d_vecs[0][i] = r_vecs[0][i]; // d0 = r0
+        d_vecs[0][i] = grad_vecs[0][i]; // d0 = grad0
     //iterative process
     for(int k = 0; k < iters; ++k){
         alpha = calc_alpha(sigma, rho, x_vecs[k], d_vecs[k], 2);
