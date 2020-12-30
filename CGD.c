@@ -16,31 +16,28 @@ void eval_gradient(double *x, double *out){
 
 }
     
-double calc_alpha(double sigma, double rho, double *x, double *d, int len){
+void do_displacement(double sigma, double rho, double *x, double *new_x, double *d, int len){
     // set alpha to one
     double alpha = 1;
     double init_value_f = rosenbrock(x);
     // evaluate gradient at point x
     double grad_f[2];
     eval_gradient(x, grad_f);
-    // store current x
-    double xx[2];
-    for(int i = 0; i < len ; ++i)
-        xx[i] = x[i];
     // now change x -> x + d
     for(int i = 0; i < len; ++i)
-        x[i] = x[i] + alpha * d[i];
+        new_x[i] = x[i] + alpha * d[i];
     // evaluate f at this new point
-    double new_value_f = rosenbrock(x);
+    double new_value_f = rosenbrock(new_x);
+    // printf("Alpha: %f\n", alpha);
     while (new_value_f > init_value_f + sigma * alpha * vector_mult(grad_f, d, len))
     {
         alpha = alpha * rho;
+        // printf("Alpha: %.20g\n", alpha);
         for(int i = 0; i < len; ++i)
-            x[i] = xx[i] + alpha * d;
-        new_value_f = rosenbrock(x);
+            new_x[i] = x[i] + alpha * d[i];
+        new_value_f = rosenbrock(new_x);
+        if(alpha < 1e-4) break;
     }
-    
-    return alpha;
 }
 double calc_beta(double *new_grad, double *d, int len){
     double beta;
@@ -50,13 +47,23 @@ double calc_beta(double *new_grad, double *d, int len){
         numerator += new_grad[i]*d[i];
     for(int i = 0; i < len; ++i)
         denominator += d[i]*d[i];
+    // if(denominator == 0) puts("Denominator is 0");
     beta = numerator/denominator;
     return beta;
 }
 double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, double seed_x2){
-    double grad_vecs[iters + 1][2];
-    double d_vecs[iters + 1][2];
-    double x_vecs[iters + 1][2];
+    // double grad_vecs[iters + 1][2];
+    double **grad_vecs;
+    grad_vecs = (double**)malloc((iters+1) * sizeof(double));
+    for(int i = 0; i < iters + 1; ++i) grad_vecs[i] = (double*)malloc(2*sizeof(double));
+    // double d_vecs[iters + 1][2]
+    double **d_vecs;
+    d_vecs = (double**)malloc((iters+1) * sizeof(double));
+    for(int i = 0; i < iters + 1; ++i) d_vecs[i] = (double*)malloc(2*sizeof(double));
+    // double x_vecs[iters + 1][2];
+    double **x_vecs;
+    x_vecs = (double**)malloc((iters+1) * sizeof(double));
+    for(int i = 0; i < iters + 1; ++i) x_vecs[i] = (double*)malloc(2*sizeof(double));
     double beta;
     double alpha;
     
@@ -68,20 +75,29 @@ double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, do
         d_vecs[0][i] = grad_vecs[0][i]; // d0 = grad0
     //iterative process
     for(int k = 0; k < iters; ++k){
-        alpha = calc_alpha(sigma, rho, x_vecs[k], d_vecs[k], 2);
-        for(int i = 0; i < 2; ++i)
-            x_vecs[k + 1][i] = x_vecs[k][i] + alpha * d_vecs[k][i];
+        do_displacement(sigma, rho, x_vecs[k], x_vecs[k + 1], d_vecs[k], 2);
         // we moved to the next point. Now we must compute the next direction we will jump in
         // for that we have to compute the beta_k, but to do that we need to know the -gradient (r) value at this point we just moved to
-        eval_gradient(x_vecs[k], grad_vecs[k]);
+        eval_gradient(x_vecs[k + 1], grad_vecs[k + 1]);
+        // printf("New point x: (%.20g, %.20g)\n", x_vecs[k + 1][0], x_vecs[k + 1][1]);
         // now we compute beta
         beta = calc_beta(grad_vecs[k + 1], d_vecs[k], 2);
+        // printf("beta: %.20f\n", beta);
         for(int i = 0; i < 2; ++i)
-            d_vecs[k + 1][i] = -grad_vecs[k][i] + beta * d_vecs[k][i];
+            d_vecs[k + 1][i] = -grad_vecs[k + 1][i] + beta * d_vecs[k][i];
+        // printf("d is %.20f, %.20f \n", d_vecs[k][0], d_vecs[k][1]);
         //printf("Convergence point: (%f, %f)\n", x_vecs[iters][0], x_vecs[iters][1]);
 
     }
-    printf("Convergence point: (%f, %f)\n", x_vecs[iters][0], x_vecs[iters][1]);
+    printf("Convergence point: (%.30f, %.30f)\n", x_vecs[iters][0], x_vecs[iters][1]);
+    for(int i  = 0; i < iters + 1; ++i){
+        free(grad_vecs[i]);
+        free(d_vecs[i]);
+        free(x_vecs[i]);
+    }
+    free(grad_vecs); 
+    free(d_vecs); 
+    free(x_vecs);
     return 0.4345;
 }
 
@@ -96,7 +112,7 @@ int main(int argc, char const *argv[])
     if error it's below a certain threshold, then stop the iterative process and return the last point as the one corresponding to the global minimum
     */   
 
-   unsigned long iters = 1e5;
+   unsigned long iters = atoi(argv[1]);
    double sigma = 1e-4;
    double rho = 0.5;
    double x1 = -1.5;
