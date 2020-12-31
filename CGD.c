@@ -1,20 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-double vector_mult(double *in1, double *in2, int len){
-    double out = 0;
-    for(int i = 0; i < len; ++i)
-        out += in1[i]*in2[i];
-    return out;
-}
-double rosenbrock(double *x){
-    return 100*pow(x[1] -x[0], 2) + pow(1 - x[0], 2);
-}
-void eval_gradient(double *x, double *out){
-    out[0] = 2*(200*pow(x[0], 3) - 200*x[0]*x[1] + x[0] - 1);
-    out[1] = 200*(x[1]- pow(x[0], 2));
-
-}
+#include "utils.h"
     
 void do_displacement(double sigma, double rho, double *x, double *new_x, double *d, int len){
     // set alpha to one
@@ -29,7 +16,7 @@ void do_displacement(double sigma, double rho, double *x, double *new_x, double 
     // evaluate f at this new point
     double new_value_f = rosenbrock(new_x);
     // printf("Alpha: %f\n", alpha);
-    while (new_value_f > init_value_f + sigma * alpha * vector_mult(grad_f, d, len))
+    while (new_value_f > init_value_f + sigma * alpha * scalar_product(grad_f, d, len))
     {
         alpha = alpha * rho;
         // printf("Alpha: %.20g\n", alpha);
@@ -103,20 +90,11 @@ double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, do
 
 int main(int argc, char const *argv[])
 {
-    /* 
-    Set seed
-    Compute d(k) = - Grad_f(x(k)) + beta(k)d(k-1) such that d(k)*d(k-1) = 0
-    Compute alpha(k); as it is a quadratic function just use minimization of phi(alpha(k)) = f(x(k) + alpha(k)d(k)) 
-    move to the next point x(k+1) = x(k) + alpha(k)d(k)
-    Compute error 
-    if error it's below a certain threshold, then stop the iterative process and return the last point as the one corresponding to the global minimum
-    */   
-
-   unsigned long iters = atoi(argv[1]);
-   double sigma = 1e-4;
-   double rho = 0.5;
-   double x1 = -1.5;
-   double x2 = -1;
-   CGD(iters, sigma, rho, x1, x2);
-   return 0;
+    unsigned long iters = atoi(argv[1]);
+    double sigma = 1e-4;
+    double rho = 0.5;
+    double x1 = -1.5;
+    double x2 = -1;
+    CGD(iters, sigma, rho, x1, x2);
+    return 0;
 }
