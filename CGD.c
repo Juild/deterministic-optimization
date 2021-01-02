@@ -39,15 +39,12 @@ double calc_beta(double *new_grad, double *d, int len){
     return beta;
 }
 double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, double seed_x2){
-    // double grad_vecs[iters + 1][2];
     double **grad_vecs;
     grad_vecs = (double**)malloc((iters+1) * sizeof(double));
     for(int i = 0; i < iters + 1; ++i) grad_vecs[i] = (double*)malloc(2*sizeof(double));
-    // double d_vecs[iters + 1][2]
     double **d_vecs;
     d_vecs = (double**)malloc((iters+1) * sizeof(double));
     for(int i = 0; i < iters + 1; ++i) d_vecs[i] = (double*)malloc(2*sizeof(double));
-    // double x_vecs[iters + 1][2];
     double **x_vecs;
     x_vecs = (double**)malloc((iters+1) * sizeof(double));
     for(int i = 0; i < iters + 1; ++i) x_vecs[i] = (double*)malloc(2*sizeof(double));
@@ -59,20 +56,18 @@ double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, do
     x_vecs[0][1] = seed_x2;
     eval_gradient(x_vecs[0],grad_vecs[0]);
     for(int i = 0; i < 2; ++i)
-        d_vecs[0][i] = grad_vecs[0][i]; // d0 = grad0
+        d_vecs[0][i] =  - grad_vecs[0][i]; // d0 = grad0
     //iterative process
     for(int k = 0; k < iters; ++k){
         do_displacement(sigma, rho, x_vecs[k], x_vecs[k + 1], d_vecs[k], 2);
         // we moved to the next point. Now we must compute the next direction we will jump in
         // for that we have to compute the beta_k, but to do that we need to know the -gradient (r) value at this point we just moved to
         eval_gradient(x_vecs[k + 1], grad_vecs[k + 1]);
-        // printf("New point x: (%.20g, %.20g)\n", x_vecs[k + 1][0], x_vecs[k + 1][1]);
         // now we compute beta
         beta = calc_beta(grad_vecs[k + 1], d_vecs[k], 2);
         // printf("beta: %.20f\n", beta);
         for(int i = 0; i < 2; ++i)
             d_vecs[k + 1][i] = -grad_vecs[k + 1][i] + beta * d_vecs[k][i];
-        // printf("d is %.20f, %.20f \n", d_vecs[k][0], d_vecs[k][1]);
         //printf("Convergence point: (%f, %f)\n", x_vecs[iters][0], x_vecs[iters][1]);
 
     }
