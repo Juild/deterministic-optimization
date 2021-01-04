@@ -56,6 +56,6 @@ void solve_for_delta(double (*A)[2], double *gradient, double *delta, double len
 double rho(double *x, double *delta){
     double x_plus_delta[] = {0,0};
     sum_vect(x, delta, x_plus_delta, 2);
-    return (rosenbrock(x) - rosenbrock(x_plus_delta));///(rosenbrock(x) -taylor_expansion_rosenbrock(x, delta));
+    return (rosenbrock(x) - rosenbrock(x_plus_delta))/(rosenbrock(x) -taylor_expansion_rosenbrock(x, delta));
 }
 #endif
