@@ -44,9 +44,9 @@ void LM(double *seed, double mu, double alpha, double beta, unsigned long iters)
 }
 int main(int argc, char const *argv[])
 {
-    double alpha = 1.1;
-    double beta = 0.9;
-    double mu  = 10;
+    double alpha = 2;
+    double beta = 0.5;
+    double mu  = 0.005;
     unsigned long iters = atoi(argv[1]);
     double seed[] = {-1.5, -1};
     LM(seed, mu, alpha, beta, iters);
