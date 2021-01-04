@@ -21,22 +21,19 @@ void LM(double *seed, double mu, double alpha, double beta, unsigned long iters)
         eval_gradient(x_vecs[k], gradient);
         double delta[2];
     
-        double Hessian_plus_muI[2][2] = {
+        double Hessian_plus_muI[2][2] = { //checked, it's correct
                                     {-400*(x_vecs[k][1] - x_vecs[k][0]*x_vecs[k][0]) + 800*x_vecs[k][0]*x_vecs[k][0] + 2 + lambda, -400*x_vecs[k][0]}, 
                                     {-400*x_vecs[k][0], 200 + lambda}
                                     };
         double inverted_HmuI[2][2];
         invert(Hessian_plus_muI, inverted_HmuI, 2);
         solve_for_delta(inverted_HmuI, gradient, delta, 2);
-        //printf("delta : (%f, %f)\n", delta[0], delta[1]);
-        //printf("mu: %f\n", mu);
-        if(rho(x_vecs[k], delta) < 0){
-            lambda *= alpha; // alpha > 1 (increase mu <-> reduce radius)
+        
+        if(rho(x_vecs[k], delta) <= 0){
+            lambda *= alpha;
         }else{
-            lambda *= beta; //( beta < 1)
-            break;
+            lambda *= beta; 
         }
-        // if we got out of the loop it means we found a good step delta and so we update xk = xk + deltak and decrease mu (increase radius)
         for(int i = 0; i < 2; ++i)
             x_vecs[k + 1][i] = x_vecs[k][i] +  delta[i];
     }
