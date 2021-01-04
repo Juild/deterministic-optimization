@@ -8,7 +8,7 @@ void do_displacement(double sigma, double rho, double *x, double *new_x, double 
     double alpha = 1;
     double init_value_f = rosenbrock(x);
     // evaluate gradient at point x
-    double grad_f[2];
+    double grad_f[2];  
     eval_gradient(x, grad_f);
     // now change x -> x + d
     for(int i = 0; i < len; ++i)
@@ -16,14 +16,21 @@ void do_displacement(double sigma, double rho, double *x, double *new_x, double 
     // evaluate f at this new point
     double new_value_f = rosenbrock(new_x);
     // printf("Alpha: %f\n", alpha);
-    while (new_value_f > init_value_f + sigma * alpha * scalar_product(grad_f, d, len)) 
-    {
+
+    while (true) 
+    {   if((new_value_f < init_value_f + sigma * alpha * scalar_product(grad_f, d, len)) ){
+            puts("condition fullfilled");
+            break;
+        }
         alpha = alpha * rho;
         // printf("Alpha: %.20g\n", alpha);
         for(int i = 0; i < len; ++i)
             new_x[i] = x[i] + alpha * d[i];
         new_value_f = rosenbrock(new_x);
-        if(alpha < 1e-4) break;
+        if(alpha < 1e-4){
+            puts("exit due to too small alpha");
+            break;
+        } 
     }
 }
 double calc_beta(double *new_grad, double *d, int len){

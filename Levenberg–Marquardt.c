@@ -47,7 +47,7 @@ void LM(double *seed, double mu, double alpha, double beta, unsigned long iters)
         
     
     }
-    printf("Convergence point: (%f, %f)\n", x_vecs[iters][0], x_vecs[iters][1]);
+    printf("Convergence point: (%.40f, %.40f)\n", x_vecs[iters][0], x_vecs[iters][1]);
 }
 int main(int argc, char const *argv[])
 {
