@@ -5,7 +5,7 @@
 #define true  0 == 0
 double sum_vect(double *in1, double *in2, double *out, int len){
     for(int i = 0; i < len; ++i)
-        out[i] += in1[i] + in2[i];
+        out[i] = in1[i] + in2[i];
 }
 double rosenbrock(double *x){
     return 100*pow(x[1] -x[0], 2) + pow(1 - x[0], 2);
@@ -17,7 +17,7 @@ double scalar_product(double *in1, double *in2, int len){
         out += in1[i]*in2[i];
     return out;
 }
-double matrix_vector_mult(double *A[2], double *v, double *out, int len){
+double matrix_vector_mult(double (*A)[2], double *v, double *out, int len){
     for(int i = 0; i < len; ++i)
         for(int j = 0; j < len; ++j)
             out[i] += A[i][j] * v[j];
@@ -36,30 +36,26 @@ double taylor_expansion_rosenbrock(double *x, double *delta){
     matrix_vector_mult(hessian, delta, hessian_times_delta, 2);
     return image + scalar_product(gradient, delta, 2) + 0.5 *scalar_product(delta, hessian_times_delta, 2);    
 }
-void invert(double *in[2], double *out[2], int len){
-    out[0][0] = in[1][1];
-    out[0][1] = - in[0][1];
-    out[1][0] = - in[1][0];
-    out[1][1] = in[0][0];
-    
+void invert(double (*in)[2], double (*out)[2], int len){
     double det = in[0][0] * in[1][1] - in[0][1] * in[1][0];
-    for(int i = 0; i < len; ++i)
-        for(int j = 0; j < len; ++j)
-            out[i][j] *= 1/det;
+    out[0][0] = in[1][1] /det;
+    out[0][1] = - in[0][1] /det;
+    out[1][0] = - in[1][0] / det;
+    out[1][1] = in[0][0] / det;
 }
-void solve_for_delta(double *A[2], double *gradient, double *delta, double len){
+void solve_for_delta(double (*A)[2], double *gradient, double *delta, double len){
     double solution[] = {0, 0};
 
     for(int i = 0; i < len; ++i)
         for(int j = 0; j < len; ++j)
-            solution[i] -= A[i][j] * gradient[j];
+            solution[i] += A[i][j] * gradient[j];
     
     for(int i = 0; i < len; ++i)
-        delta[i] = solution[i];
+        delta[i] = -solution[i];
 }
 double rho(double *x, double *delta){
     double x_plus_delta[] = {0,0};
     sum_vect(x, delta, x_plus_delta, 2);
-    return (rosenbrock(x) - rosenbrock(x_plus_delta))/(rosenbrock(x) - taylor_expansion_rosenbrock(x, delta));
+    return (rosenbrock(x) - rosenbrock(x_plus_delta));///(rosenbrock(x) -taylor_expansion_rosenbrock(x, delta));
 }
 #endif
