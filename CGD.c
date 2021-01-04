@@ -16,7 +16,7 @@ void do_displacement(double sigma, double rho, double *x, double *new_x, double 
     // evaluate f at this new point
     double new_value_f = rosenbrock(new_x);
     // printf("Alpha: %f\n", alpha);
-    while (new_value_f > init_value_f + sigma * alpha * scalar_product(grad_f, d, len))
+    while (new_value_f > init_value_f + sigma * alpha * scalar_product(grad_f, d, len)) 
     {
         alpha = alpha * rho;
         // printf("Alpha: %.20g\n", alpha);
