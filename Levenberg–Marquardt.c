@@ -14,8 +14,8 @@ void LM(double *seed, double mu, double alpha, double beta, unsigned long iters)
         //First we need to compute the inverse of the lhs matrix:  
         // So we define the lhs matrix is 
         double Hessian_minus_muI[2][2] = {
-                                        {-400*(x_vecs[k][1] - x_vecs[k][0]*x_vecs[k][0]) + 800*x_vecs[k][0]*x_vecs[k][0] + 2 - mu, -400*x_vecs[k][0]}, 
-                                        {-400*x_vecs[k][0], 200 - mu}
+                                        {-400*(x_vecs[k][1] - x_vecs[k][0]*x_vecs[k][0]) + 800*x_vecs[k][0]*x_vecs[k][0] + 2 + mu, -400*x_vecs[k][0]}, 
+                                        {-400*x_vecs[k][0], 200  + mu}
                                         };
         // Now we invert it
         double inverted_HmuI[2][2];
@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
 {
     double alpha = 2;
     double beta = 0.5;
-    double mu  = 0.005;
+    double mu  = 10;
     unsigned long iters = atoi(argv[1]);
     double seed[] = {-1.5, -1};
     LM(seed, mu, alpha, beta, iters);
