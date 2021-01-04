@@ -6,6 +6,7 @@
 
 void LM(double *seed, double mu, double alpha, double beta, unsigned long iters){
     double x_vecs[iters + 1][2];
+    double lambda = mu;
     for(int i = 0; i < 2; ++i)
         x_vecs[0][i] = seed[i];
     for(int k  = 0; k < iters; ++k){
