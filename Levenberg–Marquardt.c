@@ -17,7 +17,6 @@ void LM(double *seed, double mu, double alpha, double beta, unsigned long iters)
         double gradient[2];
         while(true){
             ++iter;
-            // if(iter == 5) exit(11);
             double Hessian_minus_muI[2][2] = {
                                         {-400*(x_vecs[k][1] - x_vecs[k][0]*x_vecs[k][0]) + 800*x_vecs[k][0]*x_vecs[k][0] + 2 + mu, -400*x_vecs[k][0]}, 
                                         {-400*x_vecs[k][0], 200  + mu}
