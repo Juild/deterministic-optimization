@@ -15,22 +15,16 @@ void do_displacement(double sigma, double rho, double *x, double *new_x, double 
         new_x[i] = x[i] + alpha * d[i];
     // evaluate f at this new point
     double new_value_f = rosenbrock(new_x);
-    // printf("Alpha: %f\n", alpha);
 
     while (true) 
     {   if((new_value_f < init_value_f + sigma * alpha * scalar_product(grad_f, d, len)) ){
-            // puts("condition fullfilled");
             break;
         }
         alpha = alpha * rho;
-        // printf("Alpha: %.20g\n", alpha);
         for(int i = 0; i < len; ++i)
             new_x[i] = x[i] + alpha * d[i];
         new_value_f = rosenbrock(new_x);
-        if(alpha < 1e-4){
-            // puts("exit due to too small alpha");
-            break;
-        } 
+        if(alpha < 1e-4) break;
     }
 }
 double calc_beta(double *new_grad, double *d, int len){
@@ -45,7 +39,8 @@ double calc_beta(double *new_grad, double *d, int len){
     beta = numerator/denominator;
     return beta;
 }
-double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, double seed_x2){
+void CGD(long unsigned int iters, double sigma, double rho, double seed_x1, double seed_x2){
+    // dynamic allocation of arrays to avoid a possible stack overflow
     double **grad_vecs;
     grad_vecs = (double**)malloc((iters+1) * sizeof(double));
     for(int i = 0; i < iters + 1; ++i) grad_vecs[i] = (double*)malloc(2*sizeof(double));
@@ -72,10 +67,8 @@ double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, do
         eval_gradient(x_vecs[k + 1], grad_vecs[k + 1]);
         // now we compute beta
         beta = calc_beta(grad_vecs[k + 1], d_vecs[k], 2);
-        // printf("beta: %.20f\n", beta);
         for(int i = 0; i < 2; ++i)
             d_vecs[k + 1][i] = -grad_vecs[k + 1][i] + beta * d_vecs[k][i];
-        //printf("Convergence point: (%f, %f)\n", x_vecs[iters][0], x_vecs[iters][1]);
 
     }
     printf("Convergence point: (%.30f, %.30f)\n", x_vecs[iters][0], x_vecs[iters][1]);
@@ -87,7 +80,6 @@ double CGD(long unsigned int iters, double sigma, double rho, double seed_x1, do
     free(grad_vecs); 
     free(d_vecs); 
     free(x_vecs);
-    return 0.4345;
 }
 
 int main(int argc, char const *argv[])
