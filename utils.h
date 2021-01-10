@@ -8,7 +8,7 @@ double sum_vect(double *in1, double *in2, double *out, int len){
         out[i] = in1[i] + in2[i];
 }
 double rosenbrock(double *x){
-    return 100*pow(x[1] -x[0], 2) + pow(1 - x[0], 2);
+    return 100*pow(x[1] -x[0]*x[0], 2) + pow(1 - x[0], 2);
 }
 
 double scalar_product(double *in1, double *in2, int len){

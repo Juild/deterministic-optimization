@@ -19,7 +19,7 @@ void do_displacement(double sigma, double rho, double *x, double *new_x, double 
 
     while (true) 
     {   if((new_value_f < init_value_f + sigma * alpha * scalar_product(grad_f, d, len)) ){
-            puts("condition fullfilled");
+            // puts("condition fullfilled");
             break;
         }
         alpha = alpha * rho;
@@ -28,7 +28,7 @@ void do_displacement(double sigma, double rho, double *x, double *new_x, double 
             new_x[i] = x[i] + alpha * d[i];
         new_value_f = rosenbrock(new_x);
         if(alpha < 1e-4){
-            puts("exit due to too small alpha");
+            // puts("exit due to too small alpha");
             break;
         } 
     }
